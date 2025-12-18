@@ -1,0 +1,2 @@
+# text2sql_agent
+使用langchain框架搭建了一个text2sql_agent
