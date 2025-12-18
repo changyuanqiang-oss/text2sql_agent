@@ -2,7 +2,7 @@ from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import Type, Optional, List, Dict, Any
 import re
-from src1.db_utils import MySQLDatabaseManager
+from src.db_utils import MySQLDatabaseManager
 
 class ListTablesTool(BaseTool):
     name: str = "ListTablesTool"
