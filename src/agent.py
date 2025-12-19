@@ -3,6 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 import dotenv
 import re
+from src.chart import create_report
 from langgraph.checkpoint.memory import InMemorySaver
 from src.test_to_sql_tools import DatabaseToolsFactory
 dotenv.load_dotenv()
@@ -24,18 +25,20 @@ llm = ChatOpenAI(temperature=0,
                  model="qwen3-80b" ,
                  )
 
-# 创建数据库工具
+# 创建工具
 tools_factory = DatabaseToolsFactory(connection_string)
 database_tools = tools_factory.create_all_tools()
+database_tools.append(create_report)
 
 # 创建Agent
 agent = create_agent(
     tools=database_tools,
     model=llm,
-    checkpointer=InMemorySaver(),
+    # checkpointer=InMemorySaver(),
     system_prompt="你是一名数据分析师，请回答用户的问题",
 )
-config = {"configurable": {"thread_id": "1"}}
+
+# config = {"configurable": {"thread_id": "1"}}
 
 prompt1 = """
 你现在是一名专业的数据分析师，任务是根据用户的数据查询需求，从提供的数据集中提取并整理对应的结果。
@@ -84,9 +87,8 @@ prompt = """
 - 输出结果需清晰标注数据对应的维度（如时间、类别等），确保数据含义明确
 - 最后的结果以json格式返回
 """
-# response = agent.invoke({"input": prompt})
-# response = agent.invoke({"query": query})
-response = agent.invoke({"role": "user", "messages": prompt},config)
+
+response = agent.invoke({"role": "user", "messages": prompt})
 result = response["messages"][-1].content
 print(result)
 
